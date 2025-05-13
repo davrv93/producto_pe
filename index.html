@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Personalizador de Termos</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Roboto&family=Montserrat&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 15%;
+            background: #f5f5f5;
+            padding: 10px;
+            overflow-y: auto;
+            border-right: 1px solid #ccc;
+        }
+        .sidebar img {
+            width: 100%;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            transition: border 0.3s ease;
+        }
+        .sidebar img:hover {
+            border-color: #007bff;
+        }
+        .main {
+            width: 85%;
+            display: flex;
+        }
+        .image-container {
+            width: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        #customText {
+            position: absolute;
+            color: black;
+            font-size: 24px;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .controls {
+            width: 50%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        label, select, input, button {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .dimension-info, .character-limit-info {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <img src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-White-24-oz-1.jpg?v=1732585683&width=1946" class="thermo-option" data-src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-White-24-oz-1.jpg?v=1732585683&width=1946">
+        <img src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-Light-Pink-24-oz-1.jpg?v=1732585170&width=1946" class="thermo-option" data-src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-Light-Pink-24-oz-1.jpg?v=1732585170&width=1946">
+        <img src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-Sea-Glass-24-oz-1.jpg?v=1732585001&width=1946" class="thermo-option" data-src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-Sea-Glass-24-oz-1.jpg?v=1732585001&width=1946">
+    </div>
+    <div class="main">
+        <div class="image-container">
+            <img id="thermoImage" src="https://jmzperu.com/cdn/shop/files/Slim-Tumbler-White-24-oz-1.jpg?v=1732585683&width=1946">
+            <div id="customText">Texto</div>
+        </div>
+        <div class="controls">
+            <button id="customizeBtn">Hazlo único y especial</button>
+            <div id="customOptions" class="hidden">
+                <label for="engravingType">Tipo de grabado:</label>
+                <select id="engravingType">
+                    <option value="initial">Inicial</option>
+                    <option value="name">Nombre</option>
+                    <option value="phrase">Frase</option>
+                </select>
+                <div class="character-limit-info" id="limitInfo">Solo se permite una letra o número en mayúscula.</div>
+                <label for="engravingText">Texto:</label>
+                <input type="text" id="engravingText">
+
+                <label>Orientación:</label>
+                <select id="orientation">
+                    <option value="vertical">Vertical</option>
+                    <option value="horizontal" selected>Horizontal</option>
+                </select>
+
+                <label>Tamaño de fuente: <span id="fontSizeDisplay">24px</span></label>
+                <button id="increaseFont">+</button>
+                <button id="decreaseFont">-</button>
+
+                <label for="fontSelect">Fuente:</label>
+                <select id="fontSelect">
+                    <option value="Roboto">Roboto</option>
+                    <option value="Great Vibes">Great Vibes</option>
+                    <option value="Montserrat">Montserrat</option>
+                </select>
+                <div class="dimension-info">
+                    Dimensiones de imagen: <span id="imageSize"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fontSize = 24;
+
+        function updateCustomText() {
+            let text = $('#engravingText').val();
+            const type = $('#engravingType').val();
+            const orientation = $('#orientation').val();
+            const customText = $('#customText');
+            const limitInfo = $('#limitInfo');
+
+            // Validación por tipo
+            if (type === 'initial') {
+                text = text.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 1);
+                limitInfo.text('Solo se permite una letra o número en mayúscula.');
+            } else if (type === 'name') {
+                text = text.replace(/[^a-zA-Z ]/g, '').substring(0, 15);
+                limitInfo.text('Máximo 15 letras.');
+            } else if (type === 'phrase') {
+                text = text.replace(/[^a-zA-Z ]/g, '').substring(0, 20);
+                limitInfo.text('Máximo 20 letras.');
+            }
+
+            $('#engravingText').val(text);
+            customText.text(text);
+
+            // Inicialización del estilo
+            fontSize = parseInt($('#fontSizeDisplay').text());
+            customText.css({
+                'font-size': fontSize + 'px',
+                'font-family': $('#fontSelect').val(),
+                'transform': orientation === 'vertical' ? 'translate(-50%, -50%) rotate(-90deg)' : 'translate(-50%, -50%)'
+            });
+
+            // Ajuste dinámico
+            const container = $('.image-container');
+            const maxWidth = container.width() * 0.5;
+            const maxHeight = container.height() * 0.5;
+
+            customText.css({
+                left: '50%',
+                top: '50%'
+            });
+
+            while ((customText.outerWidth() > maxWidth || customText.outerHeight() > maxHeight) && fontSize > 8) {
+                fontSize--;
+                customText.css('font-size', fontSize + 'px');
+                $('#fontSizeDisplay').text(fontSize + 'px');
+            }
+        }
+
+        $('#customizeBtn').on('click', () => {
+            $('#customOptions').removeClass('hidden');
+        });
+
+        $('#engravingType, #engravingText, #orientation, #fontSelect').on('input change', updateCustomText);
+
+        $('#increaseFont').on('click', () => {
+            fontSize++;
+            $('#fontSizeDisplay').text(fontSize + 'px');
+            updateCustomText();
+        });
+
+        $('#decreaseFont').on('click', () => {
+            fontSize = Math.max(8, fontSize - 1);
+            $('#fontSizeDisplay').text(fontSize + 'px');
+            updateCustomText();
+        });
+
+        $('.thermo-option').on('click', function () {
+            const src = $(this).data('src');
+            $('#thermoImage').attr('src', src);
+        });
+
+        $('#thermoImage').on('load', function () {
+            $('#imageSize').text(`${this.naturalWidth} x ${this.naturalHeight}`);
+            updateCustomText();
+        });
+
+        $(document).ready(() => {
+            $('#imageSize').text(`${$('#thermoImage')[0].naturalWidth} x ${$('#thermoImage')[0].naturalHeight}`);
+            updateCustomText();
+        });
+    </script>
+</body>
+</html>
